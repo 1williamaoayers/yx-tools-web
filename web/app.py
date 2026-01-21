@@ -162,8 +162,20 @@ def run_speedtest():
         if mode == 'normal' and not region:
             mode = 'beginner'
 
+        # 代理设置
+        proxy = data.get('proxy', '')
+        
         # 构建命令部分的 list
-        cmd_parts = [f'docker exec {CONTAINER_NAME} python3 /app/cloudflare_speedtest.py']
+        # 注意: -e 环境变量必须在 docker exec 之后，容器名之前
+        cmd_parts = ['docker', 'exec']
+        
+        if proxy:
+            cmd_parts.append(f'-e HTTP_PROXY={proxy}')
+            cmd_parts.append(f'-e HTTPS_PROXY={proxy}')
+            
+        cmd_parts.append(CONTAINER_NAME)
+        cmd_parts.append('python3 /app/cloudflare_speedtest.py')
+        
         cmd_parts.append(f'--mode {mode}')
         if ipv6: cmd_parts.append('--ipv6')
         cmd_parts.append(f'--count {count}')
