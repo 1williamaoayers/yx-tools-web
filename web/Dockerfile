@@ -3,8 +3,9 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# 安装 Docker CLI（用于执行 docker exec）
-RUN apt-get update && apt-get install -y docker.io && rm -rf /var/lib/apt/lists/*
+# 优化：只从官方镜像复制 docker 客户端二进制文件 (大幅减小体积)
+# 相比安装 docker.io (含服务端)，这能节省约 150MB+ 空间
+COPY --from=docker:cli /usr/local/bin/docker /usr/local/bin/
 
 # 安装 Python 依赖
 COPY requirements.txt .
