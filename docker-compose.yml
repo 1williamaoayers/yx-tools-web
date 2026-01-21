@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  yx-tools:
+    image: ghcr.nju.edu.cn/1williamaoayers/yx-tools:latest
+    container_name: cf-speedtest
+    volumes:
+      - ./data:/app/data
+      - ./config:/app/config
+    # 强制让容器保持运行，覆盖默认的入口点（假设默认是运行一次脚本）
+    entrypoint: [ "tail", "-f", "/dev/null" ]
+    restart: unless-stopped
+
+  web:
+    build: ./web
+    container_name: yx-tools-web
+    ports:
+      - "5000:5000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./data:/data
+      - ./config:/config
+      # 开发模式挂载：方便修改代码生效
+      # 注意：容器内是 /app，我们挂载 ./web 到 /app
+      - ./web:/app
+    environment:
+      - CONTAINER_NAME=cf-speedtest
+      - DATA_DIR=/data
+      - CONFIG_DIR=/config
+      - FLASK_ENV=development
+    # 开发模式下使用 python 直接启动，方便看日志和热重载
+    command: python app.py
+    depends_on:
+      - yx-tools
+    restart: unless-stopped

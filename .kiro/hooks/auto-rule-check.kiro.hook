@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "自动规则检查",
+  "description": "AI 执行完成后自动检查是否遵守 .antigravityrules 中的规则，包括语言使用、记录更新、验证要求等",
+  "version": "1",
+  "when": {
+    "type": "agentStop"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "执行自主验证：检查本次操作是否违反规则（语言使用、记录更新、验证要求、流程规范），发现违规立即纠正"
+  }
+}

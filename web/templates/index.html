@@ -1,109 +1,507 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>yx-tools 管理面板</title>
-    <meta name="description" content="Cloudflare SpeedTest 管理面板">
+    <title>yx-tools 专业版控制中心</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
-    <div class="container">
-        <!-- 头部 -->
-        <header class="header">
-            <h1>⚡ yx-tools 管理面板</h1>
-            <div class="status-badge" id="status-badge">
-                <span class="status-dot"></span>
-                <span class="status-text">检测中...</span>
+    <!-- Background Effects -->
+    <div class="bg-gradient"></div>
+
+    <!-- Main Container -->
+    <div class="app-container">
+
+        <!-- Sidebar (Desktop) -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">⚡</span>
+                    <span class="logo-text">yx-tools</span>
+                </div>
+                <div class="version-badge">PRO v2.0</div>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="#dashboard" class="nav-link active" data-page="dashboard">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-label">仪表盘</span>
+                </a>
+                <a href="#config" class="nav-link" data-page="config">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-label">参数配置</span>
+                </a>
+                <a href="#results" class="nav-link" data-page="results">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-label">测速结果</span>
+                </a>
+                <a href="#history" class="nav-link" data-page="history">
+                    <span class="nav-icon">📋</span>
+                    <span class="nav-label">上传历史</span>
+                </a>
+                <a href="#logs" class="nav-link" data-page="logs">
+                    <span class="nav-icon">🖥️</span>
+                    <span class="nav-label">运行日志</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="status-panel">
+                    <div class="status-label">系统状态</div>
+                    <div class="status-indicator">
+                        <span class="status-dot" id="sidebar-status-dot"></span>
+                        <span class="status-text" id="sidebar-status-text">检测中...</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Mobile Header -->
+        <header class="mobile-header">
+            <button class="menu-toggle" id="menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <div class="mobile-logo">⚡ yx-tools</div>
+            <div class="mobile-status">
+                <span class="status-dot-mini" id="mobile-status-dot"></span>
             </div>
         </header>
 
-        <!-- 主要内容区 -->
+        <!-- Main Content Area -->
         <main class="main-content">
-            <!-- 快捷操作卡片 -->
-            <section class="card action-card">
-                <h2>🚀 快捷操作</h2>
-                <div class="action-buttons">
-                    <button class="btn btn-primary" id="btn-run-test">
-                        <span class="btn-icon">▶️</span>
-                        立即测速
-                    </button>
-                    <button class="btn btn-secondary" id="btn-refresh">
-                        <span class="btn-icon">🔄</span>
-                        刷新结果
-                    </button>
-                </div>
-            </section>
 
-            <!-- 配置卡片 -->
-            <section class="card config-card">
-                <h2>⚙️ 测速配置</h2>
+            <!-- Page: Dashboard -->
+            <div class="page active" id="page-dashboard">
+                <div class="page-header">
+                    <h1>仪表盘</h1>
+                    <p class="page-subtitle">快速操作与系统概览</p>
+                </div>
+
+                <!-- Quick Actions -->
+                <section class="card">
+                    <div class="card-header">
+                        <h2>快速操作</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="quick-actions">
+                            <button class="btn btn-primary btn-large" id="btn-run-quick">
+                                <span class="btn-icon">▶️</span>
+                                <span class="btn-text">立即测速</span>
+                            </button>
+                            <button class="btn btn-secondary" id="btn-view-results">
+                                <span class="btn-icon">📊</span>
+                                <span class="btn-text">查看结果</span>
+                            </button>
+                            <button class="btn btn-secondary" id="btn-view-logs">
+                                <span class="btn-icon">🖥️</span>
+                                <span class="btn-text">查看日志</span>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- System Status -->
+                <div class="grid-2">
+                    <section class="card">
+                        <div class="card-header">
+                            <h2>运行状态</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="stat-group">
+                                <div class="stat-item">
+                                    <div class="stat-label">当前状态</div>
+                                    <div class="stat-value" id="dash-status">就绪</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">最近测速</div>
+                                    <div class="stat-value stat-muted" id="dash-last-run">未运行</div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="card">
+                        <div class="card-header">
+                            <h2>定时任务</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="stat-group">
+                                <div class="stat-item">
+                                    <div class="stat-label">Cron 状态</div>
+                                    <div class="stat-value stat-muted" id="dash-cron-status">未设置</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">下次执行</div>
+                                    <div class="stat-value stat-muted" id="dash-cron-next">--</div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Recent Results Preview -->
+                <section class="card">
+                    <div class="card-header">
+                        <h2>最新结果</h2>
+                        <a href="#results" class="link-action" data-page="results">查看全部 →</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>IP 地址</th>
+                                        <th>速度</th>
+                                        <th>延迟</th>
+                                        <th>数据中心</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dash-results-preview">
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted">暂无数据</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Page: Config -->
+            <div class="page" id="page-config">
+                <div class="page-header">
+                    <h1>参数配置</h1>
+                    <p class="page-subtitle">配置测速参数与上传选项</p>
+                </div>
+
                 <form id="config-form">
-                    <div class="form-group">
-                        <label for="mode">测速模式</label>
-                        <select id="mode" name="mode">
-                            <option value="beginner">小白模式 (推荐)</option>
-                            <option value="normal">常规模式</option>
-                        </select>
+                    <!-- Basic Settings -->
+                    <section class="card">
+                        <div class="card-header">
+                            <h2>基础设置</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    测速模式
+                                    <span class="tooltip-trigger" data-tooltip="选择适合您的测速模式">ℹ️</span>
+                                </label>
+                                <select class="form-control" id="mode" name="mode">
+                                    <option value="beginner">小白模式 - 使用默认参数快速测速</option>
+                                    <option value="normal" selected>常规模式 - 自定义参数进行测速</option>
+                                    <option value="proxy">优选反代 - 从已有结果中筛选优质IP</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group dynamic-field" id="field-region" style="display:none;">
+                                <label class="form-label">
+                                    地区代码
+                                    <span class="tooltip-trigger"
+                                        data-tooltip="例如: HKG(香港), SIN(新加坡), 多个用逗号分隔">ℹ️</span>
+                                </label>
+                                <input type="text" class="form-control" id="region" name="region"
+                                    placeholder="留空则全球扫描，如: HKG,SIN,TYO">
+                            </div>
+
+                            <div class="form-group dynamic-field" id="field-proxy-file" style="display:none;">
+                                <label class="form-label">
+                                    CSV 结果文件
+                                    <span class="tooltip-trigger" data-tooltip="上传之前测速生成的 result.csv 文件">ℹ️</span>
+                                </label>
+                                <div class="file-input-wrapper">
+                                    <input type="file" id="proxy-file" accept=".csv" hidden>
+                                    <button type="button" class="btn btn-outline"
+                                        onclick="document.getElementById('proxy-file').click()">
+                                        📁 选择文件
+                                    </button>
+                                    <span class="file-name-display" id="file-name">未选择文件</span>
+                                    <button type="button" class="btn btn-sm btn-primary" id="btn-upload">上传</button>
+                                    <input type="hidden" id="csv_file" name="csv_file" value="result.csv">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    IP 版本
+                                    <span class="tooltip-trigger" data-tooltip="选择使用 IPv4 还是 IPv6 进行测速">ℹ️</span>
+                                </label>
+                                <div class="checkbox-wrapper">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="ipv6" name="ipv6">
+                                        <span class="checkbox-custom"></span>
+                                        <span>启用 IPv6</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Advanced Settings -->
+                    <section class="card">
+                        <div class="card-header">
+                            <h2>高级参数</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        下载速度下限 (MB/s)
+                                        <span class="tooltip-trigger" data-tooltip="只保留速度大于此值的IP">ℹ️</span>
+                                    </label>
+                                    <input type="number" class="form-control" id="speed" name="speed" value="5"
+                                        step="0.5" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        测试 IP 数量
+                                        <span class="tooltip-trigger" data-tooltip="保留排名前N的优质IP">ℹ️</span>
+                                    </label>
+                                    <input type="number" class="form-control" id="count" name="count" value="10"
+                                        min="1">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        延迟上限 (ms)
+                                        <span class="tooltip-trigger" data-tooltip="只保留延迟小于此值的IP">ℹ️</span>
+                                    </label>
+                                    <input type="number" class="form-control" id="delay" name="delay" value="300"
+                                        min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        并发线程数
+                                        <span class="tooltip-trigger" data-tooltip="同时测试的IP数量，建议100-300">ℹ️</span>
+                                    </label>
+                                    <input type="number" class="form-control" id="thread" name="thread" value="200"
+                                        min="1">
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Upload Settings -->
+                    <section class="card">
+                        <div class="card-header">
+                            <h2>结果上传</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    上传方式
+                                    <span class="tooltip-trigger" data-tooltip="选择将测速结果上传到何处">ℹ️</span>
+                                </label>
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="upload_method" value="none" checked>
+                                        <span class="radio-custom"></span>
+                                        <span>不上传</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="upload_method" value="api">
+                                        <span class="radio-custom"></span>
+                                        <span>Worker API</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="upload_method" value="github">
+                                        <span class="radio-custom"></span>
+                                        <span>GitHub</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="dynamic-field" id="field-upload-api" style="display:none;">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        Worker URL(s)
+                                        <span class="tooltip-trigger" data-tooltip="直接粘贴完整URL，支持多个用逗号分隔">ℹ️</span>
+                                    </label>
+                                    <textarea class="form-control" id="worker_url_input" rows="3"
+                                        placeholder="示例: https://你的域名/你的UUID, https://..."></textarea>
+                                    <!-- Hidden fields for backend compatibility -->
+                                    <input type="hidden" id="worker_domains" name="worker_domains">
+                                    <input type="hidden" id="uuids" name="uuids">
+                                </div>
+                            </div>
+
+                            <div class="dynamic-field" id="field-upload-github" style="display:none;">
+                                <div class="form-group">
+                                    <label class="form-label">GitHub Token</label>
+                                    <input type="password" class="form-control" id="github_token" name="github_token"
+                                        placeholder="ghp_xxxxxxxxxxxx">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">仓库路径</label>
+                                    <input type="text" class="form-control" id="repo" name="repo"
+                                        placeholder="username/repository">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">文件路径</label>
+                                    <input type="text" class="form-control" id="file_path" name="file_path"
+                                        value="cloudflare_ips.txt">
+                                </div>
+                            </div>
+
+                            <div class="dynamic-field" id="field-upload-common" style="display:none;">
+                                <div class="form-group">
+                                    <label class="form-label">上传数量</label>
+                                    <input type="number" class="form-control" id="upload_count" name="upload_count"
+                                        value="10" min="1">
+                                </div>
+                                <div class="checkbox-wrapper">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="clear" name="clear">
+                                        <span class="checkbox-custom"></span>
+                                        <span>上传前清空旧数据</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Cron Settings -->
+                    <section class="card">
+                        <div class="card-header">
+                            <h2>定时任务</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Cron 表达式
+                                    <span class="tooltip-trigger"
+                                        data-tooltip="标准 cron 格式，如 '0 4 * * *' 表示每天凌晨4点">ℹ️</span>
+                                </label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="cron-schedule" value="0 4 * * *"
+                                        placeholder="0 4 * * *">
+                                    <button type="button" class="btn btn-secondary" id="btn-set-cron">设置定时任务</button>
+                                </div>
+                                <div class="form-hint" id="cron-status">未激活</div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-large">
+                            💾 保存配置
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="btn-reset-config">
+                            重置为默认
+                        </button>
                     </div>
-                    <div class="form-group">
-                        <label for="count">测速数量</label>
-                        <input type="number" id="count" name="count" value="10" min="1" max="100">
-                    </div>
-                    <div class="form-group">
-                        <label for="region">指定地区 (可选)</label>
-                        <input type="text" id="region" name="region" placeholder="如: HKG, NRT, LAX">
-                    </div>
-                    <button type="submit" class="btn btn-success">💾 保存配置</button>
                 </form>
-            </section>
+            </div>
 
-            <!-- 定时任务卡片 -->
-            <section class="card cron-card">
-                <h2>⏰ 定时任务</h2>
-                <div class="form-group">
-                    <label for="cron-schedule">Cron 表达式</label>
-                    <input type="text" id="cron-schedule" value="0 2 * * *" placeholder="0 2 * * *">
-                    <small class="hint">默认每天凌晨 2 点执行</small>
+            <!-- Page: Results -->
+            <div class="page" id="page-results">
+                <div class="page-header">
+                    <h1>测速结果</h1>
+                    <p class="page-subtitle">当前测速得到的优选 IP 列表</p>
                 </div>
-                <div class="cron-status" id="cron-status">
-                    <span class="cron-label">当前状态:</span>
-                    <span class="cron-value">加载中...</span>
-                </div>
-                <button class="btn btn-warning" id="btn-set-cron">📅 设置定时任务</button>
-            </section>
 
-            <!-- 结果卡片 -->
-            <section class="card results-card">
-                <h2>📊 测速结果</h2>
-                <div class="results-meta" id="results-meta">
-                    <span>最后更新: --</span>
-                    <span>共 0 条记录</span>
+                <section class="card">
+                    <div class="card-header">
+                        <h2>优选 IP 列表</h2>
+                        <div class="card-header-actions">
+                            <span class="badge" id="results-count">0 条记录</span>
+                            <button class="btn btn-sm btn-secondary" id="btn-refresh-results">🔄 刷新</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>IP 地址</th>
+                                        <th>下载速度</th>
+                                        <th>延迟</th>
+                                        <th>数据中心</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="results-table-body">
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted">暂无测速数据</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Page: History -->
+            <div class="page" id="page-history">
+                <div class="page-header">
+                    <h1>上传历史</h1>
+                    <p class="page-subtitle">记录每次上传的时间与目标</p>
                 </div>
-                <div class="table-wrapper">
-                    <table class="results-table" id="results-table">
-                        <thead>
-                            <tr>
-                                <th>IP 地址</th>
-                                <th>延迟 (ms)</th>
-                                <th>下载速度</th>
-                                <th>数据中心</th>
-                            </tr>
-                        </thead>
-                        <tbody id="results-body">
-                            <tr>
-                                <td colspan="4" class="empty-state">暂无数据，点击"立即测速"开始</td>
-                            </tr>
-                        </tbody>
-                    </table>
+
+                <section class="card">
+                    <div class="card-header">
+                        <h2>上传记录</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>时间</th>
+                                        <th>上传方式</th>
+                                        <th>目标地址</th>
+                                        <th>IP 数量</th>
+                                        <th>状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="history-table-body">
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">暂无上传历史</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Page: Logs -->
+            <div class="page" id="page-logs">
+                <div class="page-header">
+                    <h1>运行日志</h1>
+                    <p class="page-subtitle">实时查看后端运行状态</p>
                 </div>
-            </section>
+
+                <section class="card">
+                    <div class="card-header">
+                        <h2>实时终端</h2>
+                        <button class="btn btn-sm btn-secondary" id="btn-clear-logs">🗑️ 清空日志</button>
+                    </div>
+                    <div class="card-body terminal-container">
+                        <div class="terminal" id="terminal">
+                            <div class="terminal-line">> 系统就绪，等待命令...</div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
         </main>
-
-        <!-- 通知提示 -->
-        <div class="toast" id="toast"></div>
     </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
 
     <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
+
 </html>
