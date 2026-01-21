@@ -11,7 +11,9 @@
 
 ## 🚀 部署方式
 
-### 1. 先启动 yx-tools 容器
+### 方式一：使用 GitHub 预构建镜像（推荐）
+
+#### 1. 先启动 yx-tools 容器
 
 ```bash
 mkdir -p /home/yx-tools-web && cd /home/yx-tools-web
@@ -23,10 +25,48 @@ docker run -d --name cf-speedtest \
   ghcr.nju.edu.cn/1williamaoayers/yx-tools:latest
 ```
 
-### 2. 构建并运行 Web 面板
+#### 2. 直接运行 Web 面板（无需构建）
 
 ```bash
-cd /home/yx-tools-web
+# 拉取并运行预构建镜像
+docker run -d --name yx-tools-web \
+  -p 2030:5000 \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v /home/yx-tools-web/data:/data \
+  -v /home/yx-tools-web/config:/config \
+  -e CONTAINER_NAME=cf-speedtest \
+  --restart unless-stopped \
+  ghcr.io/你的用户名/yx-tools-web:latest
+```
+
+> 💡 **提示**: 将 `你的用户名` 替换为你的 GitHub 用户名
+
+#### 3. 访问面板
+
+打开浏览器访问: http://你的IP:2030
+
+---
+
+### 方式二：本地构建镜像
+
+#### 1. 先启动 yx-tools 容器
+
+```bash
+mkdir -p /home/yx-tools-web && cd /home/yx-tools-web
+
+docker run -d --name cf-speedtest \
+  -v /home/yx-tools-web/data:/app/data \
+  -v /home/yx-tools-web/config:/app/config \
+  --restart unless-stopped \
+  ghcr.nju.edu.cn/1williamaoayers/yx-tools:latest
+```
+
+#### 2. 克隆项目并构建
+
+```bash
+# 克隆项目
+git clone https://github.com/你的用户名/yx-tools-web.git
+cd yx-tools-web
 
 # 构建镜像
 docker build -t yx-tools-web ./web
@@ -42,7 +82,7 @@ docker run -d --name yx-tools-web \
   yx-tools-web
 ```
 
-### 3. 访问面板
+#### 3. 访问面板
 
 打开浏览器访问: http://你的IP:2030
 
@@ -76,6 +116,25 @@ yx-tools-web/
 
 - Web 面板挂载了 Docker socket，请勿暴露到公网
 - 建议通过 Nginx 反向代理 + 认证保护
+
+## 🤖 自动构建
+
+项目配置了 GitHub Actions 自动构建：
+- 推送到 `main` 或 `master` 分支时自动触发
+- 修改 `web/` 目录下文件时自动触发
+- 构建完成后推送到 GitHub Container Registry
+- 镜像地址: `ghcr.io/你的用户名/yx-tools-web:latest`
+
+### 手动触发构建
+
+1. 进入 GitHub 仓库
+2. 点击 `Actions` 标签
+3. 选择 `构建并推送 Docker 镜像` workflow
+4. 点击 `Run workflow` 按钮
+
+### 查看构建状态
+
+在仓库首页可以看到构建状态徽章，点击可查看详细日志。
 
 ## 📜 许可证
 
