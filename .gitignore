@@ -1,0 +1,20 @@
+# Git 忽略文件
+__pycache__/
+*.py[cod]
+*.so
+.env
+.venv/
+venv/
+*.log
+.DS_Store
+Thumbs.db
+
+# 数据目录（运行时生成）
+data/
+config/
+memory.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
