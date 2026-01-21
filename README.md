@@ -36,10 +36,10 @@ docker run -d --name yx-tools-web \
   -v /home/yx-tools-web/config:/config \
   -e CONTAINER_NAME=cf-speedtest \
   --restart unless-stopped \
-  ghcr.io/你的用户名/yx-tools-web:latest
+  ghcr.nju.edu.cn/1williamaoayers/yx-tools-web:latest
 ```
 
-> 💡 **提示**: 将 `你的用户名` 替换为你的 GitHub 用户名
+> 💡 **提示**: 将 `1williamaoayers` 替换为你的 GitHub 用户名（如果不同）
 
 #### 3. 访问面板
 
@@ -123,7 +123,7 @@ yx-tools-web/
 - 推送到 `main` 或 `master` 分支时自动触发
 - 修改 `web/` 目录下文件时自动触发
 - 构建完成后推送到 GitHub Container Registry
-- 镜像地址: `ghcr.io/你的用户名/yx-tools-web:latest`
+- 镜像地址: `ghcr.nju.edu.cn/你的用户名/yx-tools-web:latest`
 
 ### 手动触发构建
 
