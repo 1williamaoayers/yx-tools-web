@@ -207,7 +207,22 @@ def run_speedtest():
             if upload_method == 'api':
                 domains = data.get('worker_domains', '')
                 uuids = data.get('uuids', '')
-                if domains: cmd_parts.append(f'--worker-domain {domains}')
+                # 清理域名：移除可能的 https:// 或 http:// 前缀
+                # 因为 CLI 期望的是纯域名格式 (如 example.com 而不是 https://example.com)
+                if domains:
+                    cleaned_domains = []
+                    for d in domains.split(','):
+                        d = d.strip()
+                        if d.startswith('https://'):
+                            d = d[8:]
+                        elif d.startswith('http://'):
+                            d = d[7:]
+                        if d.endswith('/'):
+                            d = d[:-1]
+                        if d:
+                            cleaned_domains.append(d)
+                    domains = ','.join(cleaned_domains)
+                    cmd_parts.append(f'--worker-domain {domains}')
                 if uuids: cmd_parts.append(f'--uuid {uuids}')
             elif upload_method == 'github':
                 token = data.get('github_token', '')
@@ -320,7 +335,18 @@ def set_cron():
             if data.get('clear'): parts.append("--clear")
             
             if upload_method == 'api':
-                parts.append(f"--worker-domain {data.get('worker_domains', '')}")
+                domains = data.get('worker_domains', '')
+                # 清理域名：移除可能的 https:// 或 http:// 前缀
+                if domains:
+                    cleaned_domains = []
+                    for d in domains.split(','):
+                        d = d.strip()
+                        if d.startswith('https://'): d = d[8:]
+                        elif d.startswith('http://'): d = d[7:]
+                        if d.endswith('/'): d = d[:-1]
+                        if d: cleaned_domains.append(d)
+                    domains = ','.join(cleaned_domains)
+                parts.append(f"--worker-domain {domains}")
                 parts.append(f"--uuid {data.get('uuids', '')}")
             elif upload_method == 'github':
                 parts.append(f"--token '{data.get('github_token', '')}'")
